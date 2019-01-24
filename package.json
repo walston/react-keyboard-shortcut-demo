@@ -3,19 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "ava": "^1.1.0",
+    "electron": "^4.0.2",
+    "nyc": "^13.1.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-scripts": "2.1.3"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node ./dev-server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "react": "react-scripts start",
+    "electron": "electron ./src/Electron.js"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
+  "homepage": "./",
   "browserslist": [
     ">0.2%",
     "not dead",
