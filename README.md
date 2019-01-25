@@ -16,5 +16,5 @@ to some native features like the application menu bar and context menus (coming 
 
 ## Provided Scripts
 
-`npm start` will launch both `create-react-app` and `electron` in `development` mode
-`npm build` will compile the application for distribution
+- `npm start` will launch both `create-react-app` and `electron` in `development` mode
+- `npm build` will compile the application for distribution
