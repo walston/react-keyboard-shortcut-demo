@@ -1,6 +1,11 @@
 const net = require("net");
-const spawn = require("child_process").spawn;
-const port = parseInt(process.env.PORT) - 100 || 3000;
+const { spawn } = require("child_process");
+
+if (!process.env.BROWSER) process.env.BROWSER = "none";
+if (!process.env.PORT || !(parseInt(process.env.PORT) > 0))
+  process.env.PORT = "3000";
+if (!process.env.ELECTRON_START_URL)
+  process.env.ELECTRON_START_URL = `http://localhost:${process.env.PORT}`;
 
 const stdout = process.stdout.write.bind(process.stdout);
 const stderr = process.stderr.write.bind(process.stderr);
@@ -17,58 +22,73 @@ function log(type, prefix) {
   };
 }
 
-function kill(child) {
+let killing = {};
+function kill(child, name) {
   return new Promise(resolve => {
-    if (child.killed || child.signalCode != null || child.exitCode != null) {
-      console.log(child);
-      return resolve([child.exitCode, child.signalCode]);
-    }
-    child.on("exit", (code, sig) => resolve([code, sig]));
-    child.kill("SIGTERM");
+    if (child.exitCode != null || child.signalCode != null)
+      killing[name] = true;
+
+    if (killing[name]) return resolve([child.exitCode, child.signalCode]);
+    killing[name] = true;
+    child.on("exit", (code, signal) => resolve([code, signal]));
+    try {
+      process.kill(-child.pid, "SIGTERM");
+    } catch (e) {}
   });
 }
 
 let electron;
 let react;
+let alreadyQuitting = false;
 
-function quit(code) {
+function quit() {
+  if (alreadyQuitting) return;
+  alreadyQuitting = true;
+
   console.log("QUITTING");
+
   const killing = [];
-  if (electron) killing.push(kill(electron));
-  if (react) killing.push(kill(react));
+  if (electron) killing.push(kill(electron, "ELECTRON"));
+  if (react) killing.push(kill(react, "REACT"));
 
-  return Promise.all(killing)
-    .then(codes => process.exit(0))
-    .catch(errors => process.exit(1));
+  return Promise.all(killing).catch(errors => {
+    console.log(errors);
+    process.exit(1);
+  });
 }
 
-function connectReact() {
-  react.stdout.on("data", log("stdout", "REACT"));
-  react.stderr.on("data", log("stderr", "REACT"));
-  react.on("exit", quit);
-}
-
-function connectElectron() {
-  electron.stdout.on("data", log("stdout", "ELECTRON"));
-  electron.stderr.on("data", log("stderr", "ELECTRON"));
-  electron.on("exit", quit);
+function connect(child, name) {
+  child.stdout.on("data", log("stdout", name));
+  child.stderr.on("data", log("stderr", name));
+  child.on("exit", quit);
 }
 
 react = spawn("npm", ["run", "react"], {
-  env: { ...process.env, PORT: port.toString() }
+  env: process.env,
+  detached: true,
+  stdio: ["ignore", "pipe", "pipe"]
 });
-connectReact();
-
-process.env.ELECTRON_START_URL = `http://localhost:${port}`;
+connect(
+  react,
+  "REACT"
+);
 
 const webpack_dev_server = new net.Socket();
 
 function connectionSuccess() {
   console.log("starting electron");
-  electron = spawn("npm", ["run", "electron"], { env: process.env });
-  connectElectron();
+  electron = spawn("npm", ["run", "electron"], {
+    env: process.env,
+    detached: true,
+    stdio: ["ignore", "pipe", "pipe"]
+  });
+  connect(
+    electron,
+    "ELECTRON"
+  );
 }
 
+const port = parseInt(process.env.PORT);
 webpack_dev_server.connect({ port });
 webpack_dev_server.on("connect", connectionSuccess);
 webpack_dev_server.on("error", () => {
@@ -76,4 +96,5 @@ webpack_dev_server.on("error", () => {
 });
 
 process.on("SIGINT", quit);
+process.on("SIGTERM", quit);
 process.on("SIGQUIT", quit);
