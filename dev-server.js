@@ -1,4 +1,5 @@
 const net = require("net");
+const colors = require("colors");
 const { spawn } = require("child_process");
 
 if (!process.env.BROWSER) process.env.BROWSER = "none";
@@ -6,21 +7,6 @@ if (!process.env.PORT || !(parseInt(process.env.PORT) > 0))
   process.env.PORT = "3000";
 if (!process.env.ELECTRON_START_URL)
   process.env.ELECTRON_START_URL = `http://localhost:${process.env.PORT}`;
-
-const stdout = process.stdout.write.bind(process.stdout);
-const stderr = process.stderr.write.bind(process.stderr);
-
-function log(type, prefix) {
-  return function(message) {
-    if (type === "stderr") {
-      stderr(prefix + " !!!\n");
-      stderr(message);
-    } else {
-      stdout(prefix + " >>>\n");
-      stdout(message);
-    }
-  };
-}
 
 let killing = {};
 function kill(child, name) {
@@ -40,12 +26,11 @@ function kill(child, name) {
 let electron;
 let react;
 let alreadyQuitting = false;
-
 function quit() {
   if (alreadyQuitting) return;
   alreadyQuitting = true;
 
-  console.log("QUITTING");
+  console.log(colors.red("QUITTING"));
 
   const killing = [];
   if (electron) killing.push(kill(electron, "ELECTRON"));
@@ -57,9 +42,40 @@ function quit() {
   });
 }
 
-function connect(child, name) {
-  child.stdout.on("data", log("stdout", name));
-  child.stderr.on("data", log("stderr", name));
+function connect(child, name, color) {
+  function Register(prefix) {
+    let line = Buffer.from(prefix);
+
+    this.push = function push(data) {
+      line = Buffer.concat([line, data]);
+    };
+
+    this.flush = function flush() {
+      const old_line = Buffer.from(line);
+      line = Buffer.from(prefix);
+      return old_line;
+    };
+  }
+
+  function slice(reg, print) {
+    return function(buff) {
+      let i = buff.indexOf("\n");
+      while (i !== -1) {
+        reg.push(buff.slice(0, i + 1));
+        print(reg.flush());
+        buff = buff.slice(i + 1);
+        i = buff.indexOf("\n");
+      }
+      reg.push(buff);
+    };
+  }
+
+  let out = new Register(color(`${name} ::`));
+  let err = new Register(color(`${name} !!`));
+
+  child.stdout.on("data", slice(out, line => process.stdout.write(line)));
+  child.stderr.on("data", slice(err, line => process.stderr.write(line)));
+
   child.on("exit", quit);
 }
 
@@ -70,7 +86,8 @@ react = spawn("npm", ["run", "react"], {
 });
 connect(
   react,
-  "REACT"
+  "REACT",
+  colors.cyan
 );
 
 const webpack_dev_server = new net.Socket();
@@ -84,7 +101,8 @@ function connectionSuccess() {
   });
   connect(
     electron,
-    "ELECTRON"
+    "ELECTRON",
+    colors.magenta
   );
 }
 
