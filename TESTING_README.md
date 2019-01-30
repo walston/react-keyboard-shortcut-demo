@@ -23,9 +23,9 @@
 
 ### When to not:
 
-Small, single-use, presentational components don't need testing, **BUT** when an implementation is used in a second place, please write a test for its use-case, & if possible _both_ the _old & new_ use-cases.
+Small, single-use, presentational components don't need unit testing, **BUT** when an implementation is used in a second place, please write a unit test for its use-case; if possible **_both_** the _old & new_ use-cases.
 
-Purely presentational components—with no conditional logic or flow control—do not benefit from tests. If the exposed api of a component needs hardening, provide `prop-types` for it.
+Purely presentational components—with no conditional logic or flow control—do not benefit from unit tests. If the exposed api of a component needs hardening, provide `prop-types` for it, and use JSDoc style comments to provide autocomplete hinting.
 
 ### What this implies:
 
