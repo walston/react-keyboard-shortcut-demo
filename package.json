@@ -16,6 +16,7 @@
     "test": "react-scripts test --testPathIgnorePatterns=\"/api/\"",
     "test:api": "react-scripts test --testPathPattern=\"/api/\"",
     "test:e2e": "cypress",
+    "cypress": "cypress open",
     "eject": "react-scripts eject",
     "react": "react-scripts start",
     "electron": "electron ./src/Electron.js"
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@babel/preset-react": "^7.0.0",
     "@types/jest": "^23.3.13",
-    "colors": "^1.3.3"
+    "colors": "^1.3.3",
+    "cypress": "^3.1.4"
   }
 }
