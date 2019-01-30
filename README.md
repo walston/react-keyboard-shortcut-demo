@@ -3,7 +3,7 @@
 **Fork to get started. Merge in changes when updated**
 
 This is Hart's official Electron PWA Starter. It is based on Create-React-App for
-ease and simplicity, but uses a translation layer to electron to provide bindings
+ease and simplicity, but uses a translation layer to Electron to provide bindings
 to some native features like the application menu bar and context menus (coming soon).
 
 ## Getting Started
