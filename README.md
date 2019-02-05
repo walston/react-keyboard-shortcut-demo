@@ -1,20 +1,37 @@
-# PROGRESSIVE WEB APP STARTER
+# React Keyboard Shortcut Demo
 
-**Fork to get started. Merge in changes when updated**
+Simple showcase of how to _hook†_ into keyboard events globally and do local actions.
 
-This is Hart's official Electron PWA Starter. It is based on Create-React-App for
-ease and simplicity, but uses a translation layer to Electron to provide bindings
-to some native features like the application menu bar and context menus (coming soon).
+###### † pun intended
 
-## Getting Started
+```js
+import useKeybinding from 'useKeybindingToFocus';
 
-- Fork this repository in Gitlab
-- Clone locally: `git clone https://gitlab.hrt.io/frontend/my-pwa`
-- Go into repository: `cd my-pwa`
-- Install dependencies: `npm install`
-- Start the app in dev: `npm start`
+return default function({ keybinding, ...props }) {
+  const ref = useRef(null);
+  useKeybinding(keybinding, ref)
+  return <input ref={ref} {...props} />
+}
+```
 
-## Provided Scripts
+## How Does This Work?
 
-- `npm start` will launch both `create-react-app` and `electron` in `development` mode
-- `npm build` will compile the application for distribution
+A global registry is provided for use in `React.useEffect`: a simple `add(binding, callback)` & `remove(binding)` api is exported from `{root}/utility/shortcut-manager`. It can be used as follows.
+
+```js
+const ref = useRef(null);
+function focus() {
+  try {
+    ref.current.focus();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+useEffect(() => {
+  add(keybinding, focus);
+  return () => remove(keybinding);
+}, [ref]);
+```
+
+thanks to Hooks, this is the version provided in the `useKeybindingToFocus(binding, ref)` api that makes this a dead-simple one-liner to utilize.
