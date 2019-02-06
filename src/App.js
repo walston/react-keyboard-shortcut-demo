@@ -17,17 +17,11 @@ class App extends Component {
         </header>
         <main>
           <aside>
+            <h5 className="title">⌘L to focus</h5>
             <KeyboundList keybinding="⌘L">
-              <div className="title">⌘L to focus</div>
-              <li>
-                <button onClick={() => this.setState({ view: "A" })}>A</button>
-              </li>
-              <li>
-                <button onClick={() => this.setState({ view: "B" })}>B</button>
-              </li>
-              <li>
-                <button onClick={() => this.setState({ view: "C" })}>C</button>
-              </li>
+              <button onClick={() => this.setState({ view: "A" })}>A</button>
+              <button onClick={() => this.setState({ view: "B" })}>B</button>
+              <button onClick={() => this.setState({ view: "C" })}>C</button>
             </KeyboundList>
           </aside>
           <article>

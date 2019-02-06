@@ -27,10 +27,16 @@ export function globalListener(event) {
  * @param {Function} func
  */
 export function add(binding, func) {
-  if (typeof func === "function") bindings[binding] = func;
+  if (typeof func === "function") {
+    console.debug("Binding:", binding.toUpperCase());
+    bindings[binding.toUpperCase()] = func;
+  }
 }
 
 /** @param {string} binding "Key" & any modifier keys */
 export function remove(binding) {
-  if (bindings[binding]) delete bindings[binding];
+  if (bindings[binding.toUpperCase()]) {
+    console.debug("Removing:", binding.toUpperCase());
+    delete bindings[binding.toUpperCase()];
+  }
 }

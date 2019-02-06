@@ -34,3 +34,7 @@ aside {
   background-color: lightgray;
   padding: 0.5em;
 }
+
+aside .title {
+  margin: 0;
+}
