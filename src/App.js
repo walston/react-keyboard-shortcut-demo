@@ -11,17 +11,19 @@ class App extends Component {
   state = { counter: 0, view: "A" };
   render() {
     return (
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div className="document">
         <header className="App-header">
+          <span>&nbsp;</span>
           <KeyboundInput keybinding="⌘K" type="text" />
+          <span>&nbsp;</span>
         </header>
         <main>
           <aside>
-            <h5 className="title">⌘L to focus</h5>
+            <h2 className="title">⌘L to focus</h2>
             <KeyboundList keybinding="⌘L">
-              <button onClick={() => this.setState({ view: "A" })}>A</button>
-              <button onClick={() => this.setState({ view: "B" })}>B</button>
-              <button onClick={() => this.setState({ view: "C" })}>C</button>
+              <button onClick={() => this.setState({ view: "A" })}>Page A</button>
+              <button onClick={() => this.setState({ view: "B" })}>Page B</button>
+              <button onClick={() => this.setState({ view: "C" })}>Page C</button>
             </KeyboundList>
           </aside>
           <article>
