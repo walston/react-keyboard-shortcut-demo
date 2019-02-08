@@ -7,8 +7,8 @@ const style = {
 }
 
 /** @param {{ keybinding: string, [prop: string]: any }} props */
-export default function KeyboundInput({ keybinding, ...props }) {
+export default function KeyboundSelect({ children, keybinding, ...props }) {
   const ref = useRef(null);
   useKeybinding(keybinding, ref);
-  return <input ref={ref} {...props} style={style} placeholder={keybinding} />;
+  return <select ref={ref} {...props} style={style} placeholder={keybinding}>{children}</select>;
 }
