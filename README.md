@@ -7,7 +7,7 @@ Simple showcase of how to _hook†_ into keyboard events globally and do local a
 ```js
 import useKeybinding from 'useKeybindingToFocus';
 
-return default function({ keybinding, ...props }) {
+export default function({ keybinding, ...props }) {
   const ref = useRef(null);
   useKeybinding(keybinding, ref)
   return <input ref={ref} {...props} />
